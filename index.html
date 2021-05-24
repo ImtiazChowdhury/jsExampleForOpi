@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <div class="row">
+        <div class="col-12 p-3">
+            <div class="text-center">NavBar</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-2 border p-3">
+            <h3>SideBar</h3>
+        </div>
+        <div class="col-6 border p-3 ">
+            <form action="#" onsubmit="submitForm(event)" method="post">
+                <div class="form-group">
+                    <label for="">Name</label>
+                    <input type="text" name="name" id="name" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="">Price</label>
+                    <input type="number" name="price" id="price" class="form-control">
+                </div>
+
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+
+        <!-- product list  -->
+        <div class="col-4 border p-3">
+            <button class="btn btn-primary" onclick="refreshList()"> Refresh List</button>
+
+            <div id="productContainer">
+
+                <%for (let product of productList){%>
+                    <div class="mt-1 mb-3 bg-light">
+                        <h6 class="text-dark">
+                            <%=product.name%>
+                        </h6>
+                        <div class="text-secondary">$ <%=product.price%>
+                        </div>
+                    </div>
+                <%}%> 
+            </div>
+
+        </div>
+        <!-- /product list -->
+
+    </div>
+</body>
+
+<script>
+    async function submitForm(ev) {
+
+        ev.preventDefault()
+        const payload = {
+            name: document.getElementById("name").value,
+            price: document.getElementById("price").value
+        }
+
+        try {
+
+            const response = await fetch("http://localhost:5000/api/product", {
+                method: "POST",
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            if (response.ok) {
+                const newProduct = await response.json()
+
+                const newProductHTML = `
+                <div class="mt-1 mb-3 bg-light">
+                    <h6 class="text-dark">${newProduct.name}</h6>
+                    <div class="text-secondary">$ ${newProduct.price}</div>
+                </div>`
+                document.getElementById("productContainer").innerHTML += newProductHTML
+
+            } else {
+                console.log(await response.json()) //whatever
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    async function refreshList() {
+        const container = document.getElementById("productContainer");
+
+        try {
+            const response = await fetch("http://localhost:5000/api/product");
+            if (response.ok) {
+
+                let list = await response.json(); //eikhane product erarray ta paitesi
+
+                let listHTML = ``
+                for (let product of list) {
+                    listHTML += `
+                        <div class="mt-1 mb-3 bg-light">
+                            <h6 class="text-dark">${product.name}</h6>
+                            <div class="text-secondary">$ ${product.price}</div>
+                        </div>`
+                }
+                container.innerHTML = listHTML;
+
+            } else {
+                console.log(await response.json())
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+    //r kono doubt???/ bol best practice ki
+
+    //  ejs use kora take server side rendeing bole (SSR)
+    // SSR use korar chance thakle SSR usekora bhalo
+    // ete page  load erpor ekta exta api request kom lage
+    // cause data shurutei server theke render hoye ashe
+    // r usually ei type application react r korahoy ekhn
+    //but ei approach tai better
+    // initially ja ja data lagbe ta ekbare server theke r ender kore ana
+    // then part by part API use kora
+    // nahole production server e jokhon data besi thakbe and network latency beshi hobe tokhn 
+    // page load howar pro ekta ekta API ene ene loop koraite  koyek second time beshi lagbe
+    //application slow hye  jabe
+    // clear???
+    //multipage khtre kivabe
+    
+    //endponit gulate first e render kore dewa??
+    //erpor fetch jkore data ana?
+    //correct
+    //er sathe to jquery use kora jabe??
+    //hae but ekhn jquery use nakorai valo
+    //outdated hye gese
+    // and  JS nijei ekhn jquery er cheye better 
+    //ami jokhon render korbo first e tokhon to server er sathe oi endpoint er ar connection thakbe na??
+    //mane erpor to render page er fetch kora data dom man hobe
+    //bujhsi
+    //eita amake de
+    //download kora jay na ekhan thekei?  ... jay nope ekhon de
+    // right ........
+
+    // okay good night
+    // onek ghum paise
+    ///ami ei code  github e diye tore repo link diye debo .................
+    // study kore nish......
+
+    // bye ... good night good 
+    
+    // ejs use na korle shurute container  takhali rakhtam
+    // then page load er pore list fetch koira list er upor loop chalaitam
+    // .. ejs use korsi boila shurute eita koralage nai  ... clear???ho
+
+</script>
+
+</html>
